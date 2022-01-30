@@ -22,6 +22,9 @@ Default prefix: `rp-`
 Help panel: `rp-help`
 
 
+**DO NOT USE THIS BOT IN OTHER SERVERS BESIDES YOUR OWN! Unless you want to have the EXACT same settings for another server as well, I suggest not using the same bot and trying to claim it as "your bot".**
+
+
 **Next update Features:**
 
 1. Implement slash commands
