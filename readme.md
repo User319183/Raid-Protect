@@ -17,6 +17,10 @@ What do these filters do?
 
 This bot will be getting updates to be up-to-date.
 
+Default prefix: `rp-`
+
+Help panel: `rp-help`
+
 
 **Next update Features:**
 
