@@ -76,14 +76,15 @@ class toxicity(commands.Cog):
         if message.author.bot:
             return
 
+        toxic_words = "you suck", "u suck"
 
         with open("cogs/toxicity.txt", "r+") as file:
             for lines in file:
                 if "on" in lines:
-                    if "you suck" in message.content:
+                    if message.content in toxic_words:
+                        await message.delete()
                         await message.channel.send(f"{message.author.mention} has said toxic phrases/words !")
                         await message.author.send("Toxic words are prohibited!")
-                        await message.delete()
                         
                 else:
                     break

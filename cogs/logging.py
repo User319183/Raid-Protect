@@ -24,7 +24,6 @@ import datetime
 
 from discord import Message
 
-import aiohttp
 
 
 
