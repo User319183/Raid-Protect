@@ -1,34 +1,12 @@
-import discord
-
+import discord, os, sys, json, asyncio, re, string, datetime, aiohttp
 from discord.ext import commands
-
-from discord import activity
-
+from discord import activity, option
 from discord.commands import Option
-
-import os
-import sys
-
-import json
-
-import asyncio as asyncio
-
-import re
-import string
-
-
 from discord.ext import *
 from discord.ext.commands import *
 from ctypes import *
-import datetime
-
 from discord import Message
-
-import aiohttp
-
 from pymongo import MongoClient
-
-from discord import option
 
 
 
