@@ -24,6 +24,9 @@ import datetime
 
 from discord import Message
 
+from pymongo import MongoClient
+
+from discord import option
 
 
 
@@ -40,21 +43,7 @@ class Log(commands.Cog):
     
     
     
-    
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def log_mode_on(self, ctx: commands.Context):
 
-        with open("cogs/log.txt", "w+") as file:
-                file.truncate(0)
-                file.write("on")
-                await ctx.send("Log-Mode has been activated. Ready to protect.")
-                
-                
-                
-                
-                
-                
         
         
                
@@ -62,18 +51,19 @@ class Log(commands.Cog):
                
                 
                 
-    @commands.command()
+    @commands.slash_command()
     @commands.has_permissions(administrator=True)
-    async def log_mode_off(self, ctx: commands.Context):
+    async def logchannel(self, ctx, channel: Option(discord.TextChannel, "The channel to log in.")):
+        
+        client = MongoClient("mongodb+srv://User:PASSWORD@cluster0.fdd0q.mongodb.net/DB_NAME?retryWrites=true&w=majority")
+        db = client.THEDATABASE
+        collection = db.logchannel
+        
 
-        with open("cogs/log.txt", "w+") as file:
-                file.truncate(0)
-                file.write("off")
-                await ctx.send("Log-Mode has been turned off. Protection has been lost.")
-                
 
-                
-                
+        #add the channel ID to the database
+        collection.replace_one({"guild_id": ctx.guild.id}, {"guild_id": ctx.guild.id, "channel_id": channel.id}, upsert=True)
+        await ctx.respond(f"The log channel has been set/replaced to `{channel.name}`.")
                 
                 
 
@@ -82,50 +72,68 @@ class Log(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
-        if after.author.bot:
+        client = MongoClient("mongodb+srv://User:PASSWORD@cluster0.fdd0q.mongodb.net/DB_NAME?retryWrites=true&w=majority")
+        db = client.THEDATABASE
+        collection = db.logchannel
+        
+        
+        #if the collection is empty
+        if collection.count_documents({"guild_id": before.guild.id}) == 0:
             return
 
+        else:
+            
+        
+            if after.author.bot:
+                return
+            
+            #get the ID of the channel from the collection for the guild
+            channel_id = collection.find_one({"guild_id": after.guild.id})["channel_id"]
 
-        with open("cogs/log.txt", "r+") as file:
-            for lines in file:
-                if "on" in lines:
-                    if before.content == after.content:
-                        return
-                    try:
+                
+            #let's create the embed
+            embed = discord.Embed(title="Message Edited", description=f"{after.author.mention} edited their message in {after.channel.mention}.", color=discord.Color.blue())
+            embed.add_field(name="Before", value=before.content, inline=False)
+            embed.add_field(name="After", value=after.content, inline=False)
+            embed.set_footer(text=f"{after.author.name}#{after.author.discriminator}")
+            embed.timestamp = datetime.datetime.utcnow()
+            await self.bot.get_channel(channel_id).send(embed=embed)
 
-                        log_channel = discord.utils.get(before.guild.text_channels, name="logs")
+
+
+        
   
-                        if before.author.bot == True:
-                            return
-                        embed = discord.Embed(title="Message Edit", description=f"{before.author.mention} edited a message", color=3447003)
-                        embed.add_field(name="Before Edit:", value=before.content, inline=False)
-                        embed.add_field(name="After Edit:", value=after.content, inline=False)
-                        embed.add_field(name="Channel:", value=after.channel.mention, inline=False)
-                        await log_channel.send(embed=embed)
-
-                    except:
-                        pass
-  
   
 
+    #make an on_message_delete event
     @commands.Cog.listener()
     async def on_message_delete(self, message):
-        with open("cogs/log.txt", "r+") as file:
-            for lines in file:
-                if "on" in lines:
-                    try:
 
-                        log_channel = discord.utils.get(message.guild.text_channels, name="logs")
-   
-                        if message.author.bot == True:
-                            return
-                        embed = discord.Embed(title="Message Delete", description=f"{message.author.mention} deleted a message", color=15158332)
-                        embed.add_field(name="Deleted Message:", value=message.content, inline=False)
-                        embed.add_field(name="Channel:", value=message.channel.mention, inline=False)
-                        await log_channel.send(embed=embed)
+        
+        client = MongoClient("mongodb+srv://User:PASSWORD@cluster0.fdd0q.mongodb.net/DB_NAME?retryWrites=true&w=majority")
+        db = client.THEDATABASE
+        collection = db.logchannel
+        
+        
+        #if the collection is empty
+        if collection.count_documents({"guild_id": message.guild.id}) == 0:
+            return
 
-                    except:
-                        pass
+        else:
+            
+        
+            if message.author.bot:
+                return
+            
+            #get the ID of the channel from the collection for the guild
+            channel_id = collection.find_one({"guild_id": message.guild.id})["channel_id"]
+                
+            #let's create the embed
+            embed = discord.Embed(title="Message Deleted", description=f"{message.author.mention} deleted their message in {message.channel.mention}.", color=discord.Color.red())
+            embed.add_field(name="Deleted Content", value=message.content, inline=False)
+            embed.set_footer(text=f"{message.author.name}#{message.author.discriminator}")
+            embed.timestamp = datetime.datetime.utcnow()
+            await self.bot.get_channel(channel_id).send(embed=embed)
 
     
     
