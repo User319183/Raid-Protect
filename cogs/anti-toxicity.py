@@ -26,7 +26,9 @@ from discord import Message
 
 import aiohttp
 
+from pymongo import MongoClient
 
+from discord import option
 
 
 
@@ -39,60 +41,93 @@ class toxicity(commands.Cog):
     
     
     
-    
-    
-    
-    @commands.command()
+    @commands.slash_command()
     @commands.has_permissions(administrator=True)
-    async def toxicity_mode_on(self, ctx: commands.Context):
+    async def antitoxicity(self, ctx, option: Option(str, "Should we enable or disable anti toxicity mode?", choices=["Enable", "Disable"])):
+        
+        client = MongoClient("mongodb+srv://User:PASSWORD@cluster0.fdd0q.mongodb.net/DB_NAME?retryWrites=true&w=majority")
+        db = client.THEDATABASE
+        collection = db.antitoxicity
+        
 
-        with open("cogs/toxicity.txt", "w+") as file:
-                file.truncate(0)
-                file.write("on")
-                await ctx.send("Toxicity-Mode has been activated. Ready to protect.")
+
+        if option == "Enable":
+
+            collection.replace_one({"guild_id": ctx.guild.id}, {"guild_id": ctx.guild.id, "option": "Enable"}, upsert=True)
+
+            await ctx.respond(f"Anti toxicity has been enabled for `{ctx.guild.name}`.")
+
+        elif option == "Disable":
+            collection.replace_one({"guild_id": ctx.guild.id}, {"guild_id": ctx.guild.id, "option": "Disable"}, upsert=True)
+            await ctx.respond(f"Anti toxicity has been disabled for `{ctx.guild.name}`.")
                 
                 
                 
-    @commands.command()
+
+
+
+
+
+    @commands.slash_command()
     @commands.has_permissions(administrator=True)
-    async def toxicity_mode_off(self, ctx: commands.Context):
+    async def add_toxic_words(self, ctx, word: Option(str, "The word that will be detected as a toxic word")):
+        
+        client = MongoClient("mongodb+srv://User:PASSWORD@cluster0.fdd0q.mongodb.net/DB_NAME?retryWrites=true&w=majority")
+        db = client.THEDATABASE
+        collection = db.antitoxicity
+        collection2 = db.toxic_words
+        
+        #if the collection is empty or it the option is set to "disable"
+        if collection.count_documents({"guild_id": ctx.guild.id}) == 0 or collection.find_one({"guild_id": ctx.guild.id})["option"] == "Disable":
 
-        with open("cogs/toxicity.txt", "w+") as file:
-                file.truncate(0)
-                file.write("off")
-                await ctx.send("toxicity-Mode has been turned off. Protection has been lost.")
                 
+            await ctx.respond(f"Anti toxicity is disabled or not set for `{ctx.guild.name}`. Please enable it first.")
+            
+        else:
+    
+            if collection2.find_one({"guild_id": ctx.guild.id, "word": word}):
+                await ctx.respond(f"`{word}` is already in the database.")
+            else:
+                #add the word to the database
+                collection2.insert_one({"guild_id": ctx.guild.id, "word": word})
+                await ctx.respond(f"`{word}` has been added to the database.")
+
+            
+            
+            
+            
 
                 
                 
-                
-                
-
-
-
-
+            
     @commands.Cog.listener()
     async def on_message(self, message: Message):
+            
+        client = MongoClient("mongodb+srv://User:PASSWORD@cluster0.fdd0q.mongodb.net/DB_NAME?retryWrites=true&w=majority")
+        db = client.THEDATABASE
+        collection = db.antitoxicity
+        collection2 = db.toxic_words
+
+
+        #if message author is a bot
         if message.author.bot:
             return
 
-        toxic_words = "you suck", "u suck"
-
-        with open("cogs/toxicity.txt", "r+") as file:
-            for lines in file:
-                if "on" in lines:
-                    if message.content in toxic_words:
+        else:
+            
+            #if the guild_id is in the database, let's see if the option is enabled
+            
+            try:
+                    
+                if collection.find_one({"guild_id": message.guild.id})["option"] == "Enable":
+                    #if the message contains a word from the collection2, delete it.
+                    if collection2.find_one({"guild_id": message.guild.id, "word": message.content}):
                         await message.delete()
-                        await message.channel.send(f"{message.author.mention} has said toxic phrases/words !")
-                        await message.author.send("Toxic words are prohibited!")
-                        
-                else:
-                    break
-                        
-                        
-                        
- 
- 
+                        await message.channel.send(f"{message.author.mention} Please refrain from using toxic words. Toxic words are prohibited in this server.")
+                        return
+                    
+            except:
+                pass          
 
 
 
