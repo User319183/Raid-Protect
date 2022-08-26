@@ -1,8 +1,7 @@
-import discord
+import discord, os, sys, json, asyncio, psutil
 from discord.ext import commands
 from discord import activity
 from discord.commands import Option
-import os, sys, json, asyncio, psutil
 from datetime import datetime
 
 
@@ -58,9 +57,6 @@ class Meta(commands.Cog):
             await ctx.send(f'```py\n{e}\n```')
         else:
             await ctx.send('\N{OK HAND SIGN}')
-            
-
-                    
-                    
+           
 def setup(bot):
 	bot.add_cog(Meta(bot))
