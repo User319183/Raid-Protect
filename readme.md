@@ -1,3 +1,5 @@
+**Please know most new features have not been tested, if they don't work, please make a issue or pull request**
+
 Welcome to Raid-Protect!
 
 Raid-Protect is a Discord bot to protect your server. This bot comes with a toxicity filter, anti-invites filter, anti-spam, logging, and auto-kick. Pretty much everything you need to maintain a clean server!
