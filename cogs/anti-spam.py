@@ -1,13 +1,12 @@
 import discord, os, sys, json, asyncio, re, string, datetime, aiohttp
 from discord.ext import commands
-from discord import activity
+from discord import activity, option
 from discord.commands import Option
 from discord.ext import *
 from discord.ext.commands import *
 from ctypes import *
 from discord import Message
 from pymongo import MongoClient
-from discord import option
 
 
 class AntiSpam(commands.Cog):
