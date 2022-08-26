@@ -26,11 +26,12 @@ from discord import Message
 
 import aiohttp
 
+from pymongo import MongoClient
+
+from discord import option
 
 
-
-
-class Invites(commands.Cog):
+class AntiInvites(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
@@ -39,66 +40,70 @@ class Invites(commands.Cog):
     
     
     
-    
-    
-    
-    @commands.command()
+    @commands.slash_command()
     @commands.has_permissions(administrator=True)
-    async def invites_mode_on(self, ctx: commands.Context):
-
-        with open("cogs/invites.txt", "w+") as file:
-                file.truncate(0)
-                file.write("on")
-                await ctx.send("Invites-Mode has been activated. Ready to protect.")
-                
-                
-                
-                
-                
-                
+    async def invite_mode(self, ctx, option: Option(str, "Should we enable or disable invite mode?", choices=["Enable", "Disable"])):
         
+        client = MongoClient("mongodb+srv://User:PASSWORD@cluster0.fdd0q.mongodb.net/DB_NAME?retryWrites=true&w=majority")
+        db = client.THEDATABASE
+        collection = db.antiinvites
         
-               
-               
-               
-                
-                
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def invites_mode_off(self, ctx: commands.Context):
 
-        with open("cogs/invites.txt", "w+") as file:
-                file.truncate(0)
-                file.write("off")
-                await ctx.send("Invites-Mode has been turned off. Protection has been lost.")
+
+        if option == "Enable":
+
+            collection.replace_one({"guild_id": ctx.guild.id}, {"guild_id": ctx.guild.id, "option": "Enable"}, upsert=True)
+
+            await ctx.respond(f"Invite mode has been enabled for `{ctx.guild.name}`.")
+
+        elif option == "Disable":
+            collection.replace_one({"guild_id": ctx.guild.id}, {"guild_id": ctx.guild.id, "option": "Disable"}, upsert=True)
+            await ctx.respond(f"Invite mode has been disabled for `{ctx.guild.name}`.")
+                
+                
                 
 
-                
-                
-                
-                
+
+
+
 
 
 
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
+            
+        client = MongoClient("mongodb+srv://User:PASSWORD@cluster0.fdd0q.mongodb.net/DB_NAME?retryWrites=true&w=majority")
+        db = client.THEDATABASE
+        collection = db.antiinvites
+
+
+        #if message author is a bot
         if message.author.bot:
             return
 
-
-        with open("cogs/invites.txt", "r+") as file:
-            for lines in file:
-                if "on" in lines:
-                    if "discord.gg/" in message.content:
-                        await message.channel.send(f"{message.author.mention} has sent an invite !")
-                        await message.author.send("Discord invites are prohibited!")
+        else:
+            
+            #if the guild_id is in the database, let's see if the option is enabled
+            
+            try:
+                    
+                if collection.find_one({"guild_id": message.guild.id})["option"] == "Enable":
+                    #if the message contains a discord invite link, delete it. Discord invite links are discord.gg/ and random letters
+                    if re.search(r"discord.gg/\w+", message.content):
                         await message.delete()
-                        
-                else:
-                    break
-  
+                        await message.channel.send(f"{message.author.mention} Invite links are not allowed in this server.")
+                        return
+                    else:
+                        return
+                    
+            except:
+                pass
+                
+
+        
+
   
   
 def setup(bot):
-	bot.add_cog(Invites(bot))
+	bot.add_cog(AntiInvites(bot))
