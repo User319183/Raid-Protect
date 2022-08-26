@@ -1,9 +1,8 @@
 import discord, os, sys, json, asyncio
 from discord.ext import commands
-from discord import activity
+from discord import activity, option
 from discord.commands import Option
 from pymongo import MongoClient
-from discord import option
 class Bypass(commands.Cog):
 
     def __init__(self, bot):
