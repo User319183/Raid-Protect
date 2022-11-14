@@ -1,45 +1,16 @@
-import discord
-
+import discord, os, sys, json, asyncio, re, string, datetime, aiohttp
 from discord.ext import commands
-
-from discord import activity
-
+from discord import activity, Message, option
 from discord.commands import Option
-
-import os
-import sys
-
-import json
-
-import asyncio as asyncio
-
-import re
-import string
-
-
 from discord.ext import *
 from discord.ext.commands import *
 from ctypes import *
-import datetime
-
-from discord import Message
-
-import aiohttp
-
 from pymongo import MongoClient
-
-from discord import option
-
-
 class AntiInvites(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
 
-
-    
-    
-    
     @commands.slash_command()
     @commands.has_permissions(administrator=True)
     async def invite_mode(self, ctx, option: Option(str, "Should we enable or disable invite mode?", choices=["Enable", "Disable"])):
@@ -47,8 +18,6 @@ class AntiInvites(commands.Cog):
         client = MongoClient("mongodb+srv://User:PASSWORD@cluster0.fdd0q.mongodb.net/DB_NAME?retryWrites=true&w=majority")
         db = client.THEDATABASE
         collection = db.antiinvites
-        
-
 
         if option == "Enable":
 
@@ -62,14 +31,6 @@ class AntiInvites(commands.Cog):
                 
                 
                 
-
-
-
-
-
-
-
-
     @commands.Cog.listener()
     async def on_message(self, message: Message):
             
@@ -96,14 +57,8 @@ class AntiInvites(commands.Cog):
                         return
                     else:
                         return
-                    
             except:
                 pass
-                
 
-        
-
-  
-  
 def setup(bot):
 	bot.add_cog(AntiInvites(bot))

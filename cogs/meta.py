@@ -1,22 +1,8 @@
-import discord
-
+import discord, os, sys, json, asyncio, psutil
 from discord.ext import commands
-
 from discord import activity
-
 from discord.commands import Option
-
-import os
-import sys
-
-import json
-
-import asyncio as asyncio
-
-
 from datetime import datetime
-
-import psutil
 
 
 class Meta(commands.Cog):
@@ -50,12 +36,9 @@ class Meta(commands.Cog):
     async def info(self, ctx: commands.Context):
 
             embed = discord.Embed(title="Bot Info", description="General information about Raid Protect", color=0xD708CC)
-            embed.add_field(name="__Bot Creators:__", value="User319183#3149 \n Thewizz1338#6367 \n AnonymousDev#3773", inline=True) # please don't remove credits!!
+            embed.add_field(name="__Bot Creators:__", value="User319183#3149 \n Thewizz1338#6367 \n AnonymousDev#3773 \n Soapy7261 Official#8558", inline=True) # please don't remove credits!!
             embed.add_field(name="__Server Count:__", value=len(self.bot.guilds), inline=True)
-            all_members_embed_list = []
-            for x in self.bot.get_all_members():
-                all_members_embed_list.append(x)
-            embed.add_field(name="__Users being watched:__", value=f"{len(all_members_embed_list)}")
+            embed.add_field(name="__Users being watched:__", value=len(self.bot.users))
             embed.add_field(name="__Websocket Ping:__", value=f"{round(self.bot.latency * 1000)}")
             embed.add_field(name="__CPU Usage:__", value = f'{psutil.cpu_percent()}%', inline = False)
             embed.add_field(name="__Memory Usage:__", value = f'{psutil.virtual_memory().percent}%', inline = False)
@@ -69,15 +52,11 @@ class Meta(commands.Cog):
     async def reload(self, ctx: commands.Context, *, module: str):
         """Reloads a module."""
         try:
-            self.bot.unload_extension(module)
-            self.bot.load_extension(module)
+            self.bot.reload_extension(module)
         except Exception as e:
             await ctx.send(f'```py\n{e}\n```')
         else:
             await ctx.send('\N{OK HAND SIGN}')
-            
-
-                    
-                    
+           
 def setup(bot):
 	bot.add_cog(Meta(bot))

@@ -1,32 +1,12 @@
-import discord
-
+import discord, os, sys, json, asyncio, re, string, datetime
 from discord.ext import commands
-
-from discord import activity
-
+from discord import activity, option
 from discord.commands import Option
-
-import os
-import sys
-
-import json
-
-import asyncio as asyncio
-
-import re
-import string
-
-
 from discord.ext import *
 from discord.ext.commands import *
 from ctypes import *
-import datetime
-
 from discord import Message
-
 from pymongo import MongoClient
-
-from discord import option
 
 
 
@@ -37,20 +17,6 @@ class Log(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-
-    
-    
-    
-    
-    
-
-        
-        
-               
-               
-               
-                
-                
     @commands.slash_command()
     @commands.has_permissions(administrator=True)
     async def logchannel(self, ctx, channel: Option(discord.TextChannel, "The channel to log in.")):
@@ -101,10 +67,6 @@ class Log(commands.Cog):
 
 
 
-        
-  
-  
-
     #make an on_message_delete event
     @commands.Cog.listener()
     async def on_message_delete(self, message):
@@ -135,12 +97,5 @@ class Log(commands.Cog):
             embed.timestamp = datetime.datetime.utcnow()
             await self.bot.get_channel(channel_id).send(embed=embed)
 
-    
-    
-    
-    
-    
-    
-    
 def setup(bot):
 	bot.add_cog(Log(bot))

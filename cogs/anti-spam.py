@@ -1,45 +1,18 @@
-import discord
-
+import discord, os, sys, json, asyncio, re, string, datetime, aiohttp
 from discord.ext import commands
-
-from discord import activity
-
+from discord import activity, option
 from discord.commands import Option
-
-import os
-import sys
-
-import json
-
-import asyncio as asyncio
-
-import re
-import string
-
-
 from discord.ext import *
 from discord.ext.commands import *
 from ctypes import *
-import datetime
-
 from discord import Message
-
-import aiohttp
-
 from pymongo import MongoClient
-
-from discord import option
 
 
 class AntiSpam(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
-
-
-    
-    
-
 
 # let's work on anti-spam later. We need to work on how we will do the on_message event.
 
@@ -64,11 +37,6 @@ class AntiSpam(commands.Cog):
     #         collection.replace_one({"guild_id": ctx.guild.id}, {"guild_id": ctx.guild.id, "option": "Disable"}, upsert=True)
     #         await ctx.respond(f"Anti-Spam has been disabled for `{ctx.guild.name}`.")
             
-            
-            
-            
-
-            
-            
+    
 def setup(bot):
 	bot.add_cog(AntiSpam(bot))

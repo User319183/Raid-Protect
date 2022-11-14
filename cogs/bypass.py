@@ -1,31 +1,13 @@
-import discord
-
+import discord, os, sys, json, asyncio
 from discord.ext import commands
-
-from discord import activity
-
+from discord import activity, option
 from discord.commands import Option
-
-import os
-import sys
-
-import json
-
-import asyncio as asyncio
-
 from pymongo import MongoClient
-
-from discord import option
-
 class Bypass(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
 
-
-
-
-    
     @commands.slash_command()
     @commands.has_permissions(administrator=True)
     async def bypass_channel(self, ctx, channel: Option(discord.TextChannel, "Select a channel")):
@@ -95,21 +77,7 @@ class Bypass(commands.Cog):
         else:
             collection.delete_one({"guild_id": ctx.guild.id, "user_id": member.id})
             await ctx.respond(f"{member.mention} has been removed from the bypass list.")
-            
-            
-            
-            
-            
-            
-            
-            
-            
 
 #let's work on the view_bypass command next repository update
-
-
-
-                    
-                    
 def setup(bot):
 	bot.add_cog(Bypass(bot))
